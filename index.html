@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rupsclick._ Image Gallery</title>
+  <style>
+    body {
+  background: #fff7f2;
+  color: #333;
+  font-family: "Poppins", sans-serif;
+  transition: background 0.5s ease, color 0.5s ease;
+  text-align: center;
+}
+
+h1 {
+  margin: 20px;
+  font-size: 2em;
+}
+
+.controls {
+  text-align: center;
+  margin: 15px 0;
+}
+.controls select,
+.controls button {
+  padding: 10px 15px;
+  margin: 5px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* Gallery grid */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px;
+  margin: 20px;
+}
+.gallery-item {
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: transform 0.3s ease;
+}
+.gallery-item img {
+  width: 100%;
+  display: block;
+  transition: transform 0.4s ease;
+}
+.gallery-item:hover img {
+  transform: scale(1.1);
+}
+
+/* Masonry layout */
+.gallery.masonry {
+  column-count: 3;
+  column-gap: 15px;
+}
+.gallery.masonry .gallery-item {
+  display: inline-block;
+  margin: 0 0 15px;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 100;
+  padding-top: 50px;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.9);
+  text-align: center;
+}
+.modal-content-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  height: 80%;
+  width: 100%;
+}
+#modal-img {
+  max-width: 90%;
+  max-height: 100%;
+  cursor: grab;
+  transition: transform 0.2s ease;
+}
+#modal-img:active { cursor: grabbing; }
+#caption {
+  margin-top: 15px;
+  font-size: 18px;
+  color: #fff;
+}
+#close, .nav {
+  position: absolute;
+  top: 20px;
+  color: #fff;
+  font-size: 30px;
+  cursor: pointer;
+  padding: 10px;
+}
+#close { right: 30px; }
+#prev { left: 20px; top: 50%; transform: translateY(-50%); }
+#next { right: 20px; top: 50%; transform: translateY(-50%); }
+
+/* Animations */
+.modal img {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.modal img.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Dark mode */
+body.dark-mode {
+  background: #181818;
+  color: #f2f2f2;
+}
+body.dark-mode h1 { color: #ffcc70; }
+body.dark-mode .controls select,
+body.dark-mode .controls button {
+  background: #333;
+  color: #f2f2f2;
+}
+body.dark-mode .gallery-item {
+  box-shadow: 0 3px 10px rgba(255,255,255,0.1);
+}
+body.dark-mode .modal { background: rgba(0,0,0,0.97); }
+body.dark-mode #caption {
+  color: #ffcc70;
+  text-shadow: 0px 0px 10px rgba(255, 204, 112, 0.8);
+}
+body.dark-mode .nav {
+  color: #ffcc70;
+  text-shadow: 0px 0px 15px rgba(255, 204, 112, 0.8);
+  transition: transform 0.2s ease, color 0.3s ease;
+}
+body.dark-mode .nav:hover {
+  transform: scale(1.3);
+  color: #ffeaa7;
+}
+body.dark-mode #close {
+  color: #ff6b6b;
+  text-shadow: 0px 0px 10px rgba(255, 107, 107, 0.8);
+}
+body.dark-mode #close:hover {
+  transform: rotate(90deg);
+  color: #ff8787;
+}
+.explore-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.explore-grid .gallery-item {
+  flex: 1 1 250px; /* grow/shrink, min 250px */
+  max-width: 300px;
+}
+
+.explore-grid .gallery-item img {
+  width: 100%;
+  height: 100%;              /* stretch image to fit container */
+  object-fit: cover;         /* crop image instead of stretching */
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.explore-grid .gallery-item img:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+/* Categories */
+.categories {
+  padding: 60px 80px;
+  text-align: center;
+  background: #f9f9f9;
+}
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+.category-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+.category-card:hover {
+  transform: scale(1.05);
+}
+
+/* Featured */
+.featured {
+  padding: 60px 80px;
+  text-align: center;
+}
+.featured-carousel {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+.featured-item {
+  flex: 0 0 auto;
+  width: 300px;
+  scroll-snap-align: start;
+}
+.featured-item img {
+  width: 100%;
+  border-radius: 12px;
+}
+
+/* About */
+.about {
+  padding: 60px 80px;
+  text-align: center;
+  background: #eef7f1;
+}
+.about p {
+  max-width: 700px;
+  margin: 20px auto;
+  font-size: 18px;
+  color: #555;
+}
+
+/* Newsletter */
+.newsletter {
+  padding: 60px 80px;
+  text-align: center;
+  background: #6a9a6d;
+  color: white;
+}
+.newsletter form {
+  margin-top: 20px;
+}
+.newsletter input {
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  width: 250px;
+}
+.newsletter button {
+  padding: 12px 20px;
+  border: none;
+  background: #fff;
+  color: #6a9a6d;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-left: 10px;
+}
+.newsletter button:hover {
+  background: #f0f0f0;
+}
+/* === Upload Section === */
+.upload-section {
+  margin: 40px auto;
+  max-width: 600px;
+  padding: 25px;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.upload-section h2 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.upload-section input[type="file"] {
+  display: block;
+  margin: 15px auto;
+  padding: 10px;
+  border: 2px dashed #ff4b2b;
+  border-radius: 10px;
+  background: #fff7f5;
+  cursor: pointer;
+}
+
+.upload-section button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 25px;
+  background: linear-gradient(135deg,  #6a9a6d, #6a9a6d);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.upload-section button:hover {
+  background: linear-gradient(135deg,  #6a9a6d, #6a9a6d);
+}
+/* === Modal (Preview Image) === */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  padding-top: 80px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background: rgba(0,0,0,0.9);
+}
+
+.modal img {
+  display: block;
+  max-width: 80%;
+  max-height: 80%;
+  margin: auto;
+  border-radius: 12px;
+}
+
+.modal #caption {
+  text-align: center;
+  margin-top: 15px;
+  color: #f1f1f1;
+}
+
+/* Modal Navigation */
+.modal .nav {
+  position: absolute;
+  top: 50%;
+  font-size: 32px;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+  padding: 10px;
+  transform: translateY(-50%);
+  user-select: none;
+}
+
+#prev { left: 5%; }
+#next { right: 5%; }
+
+#close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 40px;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+}
+  </style>
+ 
+</head>
+
+<body>
+  <h1>Rupsclick._ Image Gallery</h1>
+
+  <div class="controls">
+    <select id="filter">
+      <option value="all">All Categories</option>
+      <option value="nature">Nature</option>
+      <option value="animals">Animals</option>
+      <option value="city">City</option>
+    </select>
+
+    <select id="sort">
+      <option value="default">Sort By</option>
+      <option value="name">Name</option>
+      <option value="date">Date</option>
+    </select>
+
+    <button id="slideshow-btn">▶ Start Slideshow</button>
+    <button id="layout-btn">🟦 Switch to Masonry</button>
+    <button id="theme-btn">🌙 Dark Mode</button>
+  </div>
+
+  <div class="gallery" id="gallery">
+    <div class="gallery-item" data-category="nature" data-date="2023-01-01">
+      <img src="./images/b1.jpg" alt="Mountain">
+    </div>
+    <div class="gallery-item" data-category="animals" data-date="2023-02-15">
+      <img src="./images/ban11.jpg" alt="Dog">
+    </div>
+    <div class="gallery-item" data-category="city" data-date="2023-03-20">
+      <img src="./images/ban8.jpg" alt="Skyscraper">
+    </div>
+    <div class="gallery-item" data-category="nature" data-date="2023-04-05">
+      <img src="./images/b4.jpg" alt="Forest">
+    </div>
+  </div>
+  <!-- Explore More Section -->
+  <section class="explore">
+    <h2>✨ Explore More Collections</h2>
+    <p>Discover handpicked images across different categories.</p>
+
+    <div class="explore-grid">
+      <div class="gallery-item" data-category="Explore" data-date="2024-08-01">
+        <img src="./images/ban1.jpg" alt="Preview 1">
+      </div>
+      <div class="gallery-item" data-category="Explore" data-date="2024-08-02">
+        <img src="./images/ban2.jpg " alt="Preview 2">
+      </div>
+      <div class="gallery-item" data-category="Explore" data-date="2024-08-03">
+        <img src="./images/ban3.jpg" alt="Preview 3">
+      </div>
+      <div class="gallery-item" data-category="Explore" data-date="2024-08-04">
+        <img src="./images/ban4.jpg" alt="Preview 4">
+      </div>
+      <div class="gallery-item" data-category="Explore" data-date="2024-08-05">
+        <img src="./images/ban5.jpg" alt="Preview 5">
+      </div>
+      <div class="gallery-item" data-category="Explore" data-date="2024-08-06">
+        <img src="./images/ban6.jpg" alt="Preview 6">
+      </div>
+      <div class="gallery-item" data-category="Explore" data-date="2024-08-07">
+        <img src="./images/ban7.jpg" alt="Preview 7">
+    </div>
+    <div class="gallery-item" data-category="Explore" data-date="2024-08-08">
+        <img src="./images/ban8.jpg" alt="Preview 8">
+    </div>
+   </div>
+
+    <a href="#gallery" class="explore-btn">🔎 See Full Gallery</a>
+  </section>
+<section class="categories">
+  <h2>📂 Browse by Categories</h2>
+  <div class="category-grid">
+    <div class="category-card">🌲 Nature</div>
+    <div class="category-card">✈️ Travel</div>
+    <div class="category-card">🏙️ Architecture</div>
+    <div class="category-card">🎭 Lifestyle</div>
+    <div class="category-card">🐾 Animals</div>
+    <div class="category-card">🎨 Art</div>
+  </div>
+</section>
+<section class="featured">
+  <h2>🌟 Featured Collections</h2>
+  <div class="featured-carousel">
+    <div class="featured-item">
+      <img src="./images/ban16.jpg" alt="Featured 1">
+      <p>Nature Wonders</p>
+    </div>
+    <div class="featured-item">
+      <img src="./images/ban10.jpg" alt="Featured 2">
+      <p>Urban Dreams</p>
+    </div>
+    <div class="featured-item">
+      <img src="./images/ban9.jpg" alt="Featured 3">
+      <p>Adventure Trails</p>
+    </div>
+        <div class="featured-item">
+      <img src="./images/ban15.jpg" alt="Featured 4">
+      <p>Adventure Trails</p>
+    </div>
+            <div class="featured-item">
+      <img src="./images/ban14.jpg" alt="Featured 4">
+      <p>Adventure Trails</p>
+    </div>
+    <div class="featured-item">
+      <img src="./images/ban13.jpg" alt="Featured 5">
+      <p>Adventure Trails</p>
+    </div>
+    <div class="featured-item">
+      <img src="./images/ban1.jpg" alt="Featured 6">
+      <p>Adventure Trails</p>
+    </div>
+  </div>
+</section>
+<!-- ================= USER UPLOAD & LOGIN ================= -->
+  <section class="user-section">
+    <h2>👤 User Uploads</h2>
+    <p>Login to upload your own photos to the gallery.</p>
+
+    <!-- Login Form -->
+    <form id="login-form">
+      <input type="text" id="username" placeholder="Username" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <button type="submit">Login</button>
+    </form>
+
+    <!-- Upload Form (Visible only after login) -->
+    <form id="upload-form" style="display:none;">
+      <input type="file" id="upload-input" accept="image/*" required>
+      <button type="submit">Upload Image</button>
+    </form>
+  </section>
+
+  <!-- ================= MODAL ================= -->
+  <div id="myModal" class="modal">
+    <span class="nav" id="prev">❮</span>
+    <span class="nav" id="next">❯</span>
+    <span id="close">&times;</span>
+    <div class="modal-content-wrapper">
+      <img id="modal-img" src="" alt="">
+    </div>
+    <div id="caption"></div>
+  </div>
+<br>
+<br>
+<section class="newsletter">
+  <h2>📬 Stay Updated</h2>
+  <p>Get the latest collections and inspirations straight to your inbox.</p>
+  <form>
+    <input type="email" placeholder="Enter your email" required>
+    <button type="submit">Subscribe</button>
+  </form>
+</section>
+
+  <!-- Modal -->
+  <div id="myModal" class="modal">
+    <span class="nav" id="prev">❮</span>
+    <span class="nav" id="next">❯</span>
+    <span id="close">&times;</span>
+
+    <div class="modal-content-wrapper">
+      <img id="modal-img" src="" alt="">
+    </div>
+
+    <div id="caption"></div>
+  </div>
+
+  <script>const filter = document.getElementById("filter");
+const sort = document.getElementById("sort");
+const gallery = document.getElementById("gallery");
+const galleryItems = Array.from(document.querySelectorAll(".gallery-item"));
+
+const modal = document.getElementById("myModal");
+const modalImg = document.getElementById("modal-img");
+const caption = document.getElementById("caption");
+const closeBtn = document.getElementById("close");
+const prevBtn = document.getElementById("prev");
+const nextBtn = document.getElementById("next");
+
+let currentIndex = 0;
+let slideshowInterval;
+
+// === Filtering ===
+filter.addEventListener("change", () => {
+  const value = filter.value;
+  galleryItems.forEach(item => {
+    item.style.display = (value === "all" || item.dataset.category === value) ? "block" : "none";
+  });
+});
+
+// === Sorting ===
+sort.addEventListener("change", () => {
+  let sorted = [...galleryItems];
+  if (sort.value === "name") {
+    sorted.sort((a, b) => a.querySelector("img").alt.localeCompare(b.querySelector("img").alt));
+  } else if (sort.value === "date") {
+    sorted.sort((a, b) => new Date(a.dataset.date) - new Date(b.dataset.date));
+  }
+  gallery.innerHTML = "";
+  sorted.forEach(item => gallery.appendChild(item));
+});
+
+// === Modal open ===
+galleryItems.forEach((item, i) => {
+  item.addEventListener("click", () => {
+    modal.style.display = "block";
+    currentIndex = i;
+    showImage(currentIndex);
+  });
+});
+
+function showImage(index) {
+  const img = galleryItems[index].querySelector("img");
+  modalImg.classList.remove("show");
+  modalImg.src = img.src;
+  caption.textContent = `${img.alt} | ${galleryItems[index].dataset.date} | Category: ${galleryItems[index].dataset.category}`;
+  modalImg.onload = () => modalImg.classList.add("show");
+}
+
+// Modal navigation
+prevBtn.addEventListener("click", () => {
+  currentIndex = (currentIndex - 1 + galleryItems.length) % galleryItems.length;
+  showImage(currentIndex);
+});
+nextBtn.addEventListener("click", () => {
+  currentIndex = (currentIndex + 1) % galleryItems.length;
+  showImage(currentIndex);
+});
+closeBtn.addEventListener("click", () => {
+  modal.style.display = "none";
+  resetZoom();
+});
+
+// === Slideshow ===
+document.getElementById("slideshow-btn").addEventListener("click", (e) => {
+  if (slideshowInterval) {
+    clearInterval(slideshowInterval);
+    slideshowInterval = null;
+    e.target.textContent = "▶ Start Slideshow";
+  } else {
+    modal.style.display = "block";
+    showImage(currentIndex);
+    slideshowInterval = setInterval(() => {
+      currentIndex = (currentIndex + 1) % galleryItems.length;
+      showImage(currentIndex);
+    }, 2000);
+    e.target.textContent = "⏸ Stop Slideshow";
+  }
+});
+
+// === Layout switch ===
+document.getElementById("layout-btn").addEventListener("click", (e) => {
+  gallery.classList.toggle("masonry");
+  e.target.textContent = gallery.classList.contains("masonry") ? "🔲 Switch to Grid" : "🟦 Switch to Masonry";
+});
+
+// === Theme toggle ===
+const themeBtn = document.getElementById("theme-btn");
+themeBtn.addEventListener("click", () => {
+  document.body.classList.toggle("dark-mode");
+  themeBtn.textContent = document.body.classList.contains("dark-mode") ? "☀️ Light Mode" : "🌙 Dark Mode";
+});
+
+// === Zoom & Drag ===
+let scale = 1;
+let isDragging = false;
+let startX, startY, originX = 0, originY = 0;
+
+modalImg.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  const zoomSpeed = 0.1;
+  scale = e.deltaY < 0 ? scale + zoomSpeed : Math.max(1, scale - zoomSpeed);
+  applyTransform();
+});
+
+modalImg.addEventListener("mousedown", (e) => {
+  if (scale <= 1) return;
+  isDragging = true;
+  startX = e.clientX - originX;
+  startY = e.clientY - originY;
+});
+document.addEventListener("mousemove", (e) => {
+  if (!isDragging) return;
+  originX = e.clientX - startX;
+  originY = e.clientY - startY;
+  applyTransform();
+});
+document.addEventListener("mouseup", () => { isDragging = false; });
+
+function applyTransform() {
+  modalImg.style.transform = `translate(${originX}px, ${originY}px) scale(${scale})`;
+}
+
+function resetZoom() {
+  scale = 1;
+  originX = 0;
+  originY = 0;
+  applyTransform();
+}
+// ===== SEARCH BAR =====
+const searchBar = document.getElementById("search-bar");
+searchBar.addEventListener("input", () => {
+  const searchValue = searchBar.value.toLowerCase();
+  document.querySelectorAll(".gallery-item img").forEach(img => {
+    const match = img.alt.toLowerCase().includes(searchValue);
+    img.parentElement.style.display = match ? "block" : "none";
+  });
+});
+
+// ===== USER LOGIN & UPLOAD (dummy frontend) =====
+const loginForm = document.getElementById("login-form");
+const uploadForm = document.getElementById("upload-form");
+let loggedIn = false;
+
+loginForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  // Simulate login (replace with backend call)
+  loggedIn = true;
+  alert("✅ Login successful! You can now upload images.");
+  loginForm.style.display = "none";
+  uploadForm.style.display = "block";
+});
+
+uploadForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const fileInput = document.getElementById("upload-input");
+  const file = fileInput.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      // Create new gallery item
+      const newItem = document.createElement("div");
+      newItem.classList.add("gallery-item");
+      newItem.innerHTML = `<img src="${e.target.result}" alt="${file.name}">`;
+      document.getElementById("gallery").appendChild(newItem);
+    };
+    reader.readAsDataURL(file);
+  }
+});
+</script>
+</body>
+</html>
