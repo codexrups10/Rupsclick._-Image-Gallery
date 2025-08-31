@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rupsclick._ Image Gallery</title>
+  <link rel="stylesheet" href="../style.css/style.css">
+</head>
+<body>
+  <h1>Rupsclick._ Image Gallery</h1>
+
+  <div class="controls">
+    <select id="filter">
+      <option value="all">All Categories</option>
+      <option value="nature">Nature</option>
+      <option value="animals">Animals</option>
+      <option value="city">City</option>
+    </select>
+
+    <select id="sort">
+      <option value="default">Sort By</option>
+      <option value="name">Name</option>
+      <option value="date">Date</option>
+    </select>
+
+    <button id="slideshow-btn">▶ Start Slideshow</button>
+    <button id="layout-btn">🟦 Switch to Masonry</button>
+    <button id="theme-btn">🌙 Dark Mode</button>
+  </div>
+
+  <div class="gallery" id="gallery">
+    <div class="gallery-item" data-category="nature" data-date="2023-01-01">
+      <img src="../images/b1.jpg" alt="Mountain">
+    </div>
+    <div class="gallery-item" data-category="animals" data-date="2023-02-15">
+      <img src="../images/ban11.jpg" alt="Dog">
+    </div>
+    <div class="gallery-item" data-category="city" data-date="2023-03-20">
+      <img src="../images/ban8.jpg" alt="Skyscraper">
+    </div>
+    <div class="gallery-item" data-category="nature" data-date="2023-04-05">
+      <img src="../images/b4.jpg" alt="Forest">
+    </div>
+  </div>
+  <!-- Explore More Section -->
+  <section class="explore">
+    <h2>✨ Explore More Collections</h2>
+    <p>Discover handpicked images across different categories.</p>
+
+    <div class="explore-grid">
+      <div class="gallery-item" data-category="Explore" data-date="2024-08-01">
+        <img src="../images/ban1.jpg" alt="Preview 1">
+      </div>
+      <div class="gallery-item" data-category="Explore" data-date="2024-08-02">
+        <img src="../images/ban2.jpg " alt="Preview 2">
+      </div>
+      <div class="gallery-item" data-category="Explore" data-date="2024-08-03">
+        <img src="../images/ban3.jpg" alt="Preview 3">
+      </div>
+      <div class="gallery-item" data-category="Explore" data-date="2024-08-04">
+        <img src="../images/ban4.jpg" alt="Preview 4">
+      </div>
+      <div class="gallery-item" data-category="Explore" data-date="2024-08-05">
+        <img src="../images/ban5.jpg" alt="Preview 5">
+      </div>
+      <div class="gallery-item" data-category="Explore" data-date="2024-08-06">
+        <img src="../images/ban6.jpg" alt="Preview 6">
+      </div>
+      <div class="gallery-item" data-category="Explore" data-date="2024-08-07">
+        <img src="../images/ban7.jpg" alt="Preview 7">
+    </div>
+    <div class="gallery-item" data-category="Explore" data-date="2024-08-08">
+        <img src="../images/ban8.jpg" alt="Preview 8">
+    </div>
+   </div>
+
+    <a href="#gallery" class="explore-btn">🔎 See Full Gallery</a>
+  </section>
+<section class="categories">
+  <h2>📂 Browse by Categories</h2>
+  <div class="category-grid">
+    <div class="category-card">🌲 Nature</div>
+    <div class="category-card">✈️ Travel</div>
+    <div class="category-card">🏙️ Architecture</div>
+    <div class="category-card">🎭 Lifestyle</div>
+    <div class="category-card">🐾 Animals</div>
+    <div class="category-card">🎨 Art</div>
+  </div>
+</section>
+<section class="featured">
+  <h2>🌟 Featured Collections</h2>
+  <div class="featured-carousel">
+    <div class="featured-item">
+      <img src="../images/ban16.jpg" alt="Featured 1">
+      <p>Nature Wonders</p>
+    </div>
+    <div class="featured-item">
+      <img src="../images/ban10.jpg" alt="Featured 2">
+      <p>Urban Dreams</p>
+    </div>
+    <div class="featured-item">
+      <img src="../images/ban9.jpg" alt="Featured 3">
+      <p>Adventure Trails</p>
+    </div>
+        <div class="featured-item">
+      <img src="../images/ban15.jpg" alt="Featured 4">
+      <p>Adventure Trails</p>
+    </div>
+            <div class="featured-item">
+      <img src="../images/ban14.jpg" alt="Featured 4">
+      <p>Adventure Trails</p>
+    </div>
+    <div class="featured-item">
+      <img src="../images/ban13.jpg" alt="Featured 5">
+      <p>Adventure Trails</p>
+    </div>
+    <div class="featured-item">
+      <img src="../images/ban1.jpg" alt="Featured 6">
+      <p>Adventure Trails</p>
+    </div>
+  </div>
+</section>
+<section class="newsletter">
+  <h2>📬 Stay Updated</h2>
+  <p>Get the latest collections and inspirations straight to your inbox.</p>
+  <form>
+    <input type="email" placeholder="Enter your email" required>
+    <button type="submit">Subscribe</button>
+  </form>
+</section>
+
+  <!-- Modal -->
+  <div id="myModal" class="modal">
+    <span class="nav" id="prev">❮</span>
+    <span class="nav" id="next">❯</span>
+    <span id="close">&times;</span>
+
+    <div class="modal-content-wrapper">
+      <img id="modal-img" src="" alt="">
+    </div>
+
+    <div id="caption"></div>
+  </div>
+
+  <script src="../script.js/script.js"></script>
+</body>
+</html>
